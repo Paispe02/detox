@@ -28,6 +28,7 @@ struct DetoxApp: App {
         MenuBarExtra {
             MenuBarView(connection: model.connection, automationMissing: model.automationMissing,
                         onOpen: { openMain() },
+                        onFixPermission: { openMain(); model.showOnboarding = true },
                         onUnlock: { block in openMain(); model.unlocking = block })
                 .onAppear { delegate.model = model }
         } label: {
@@ -40,6 +41,7 @@ struct DetoxApp: App {
                 .onAppear { delegate.model = model }
         }
         .defaultSize(width: 900, height: 620)
+        .windowToolbarStyle(.unified)
     }
 
     private func openMain() {

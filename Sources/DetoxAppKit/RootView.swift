@@ -29,6 +29,7 @@ public struct RootView: View {
             .navigationSplitViewColumnWidth(min: 170, ideal: 190)
             .scrollContentBackground(.hidden)
             .background(Theme.nightRaised)
+            .tint(Theme.gold)
         } detail: {
             Group {
                 switch section ?? .blocks {
@@ -47,6 +48,9 @@ public struct RootView: View {
             .background(Theme.night)
         }
         .frame(minWidth: 760, minHeight: 520)
+        .toolbarBackground(Theme.night, for: .windowToolbar)
+        .toolbarBackground(.visible, for: .windowToolbar)
+        .accentColor(Theme.gold)
         .nightSurface()
         .sheet(item: $model.editing) { target in
             BlockEditorView(existing: target.block, friends: connection.snapshot?.friends ?? [],

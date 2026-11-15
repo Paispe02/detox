@@ -89,8 +89,8 @@ public struct BlocksListView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(StatusSummary.headline(connection.snapshot)).font(Theme.title(30))
-                if let d = StatusSummary.detail(connection.snapshot) {
+                Text(StatusSummary.headline(connection.snapshot, reachable: connection.isDaemonReachable)).font(Theme.title(30))
+                if let d = StatusSummary.detail(connection.snapshot, reachable: connection.isDaemonReachable) {
                     Text(d).font(.title3).foregroundStyle(Theme.ivorySecondary)
                 }
             }

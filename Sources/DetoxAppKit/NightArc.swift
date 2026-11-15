@@ -47,37 +47,48 @@ public struct NightArc: View {
 
     private var nowVisible: Bool { Self.offset(nowMinutes) <= Self.spanLength }
 
+    private var laneHeight: CGFloat { compact ? 5 : 8 }
+    private let laneGap: CGFloat = 3
+    private var trackPadding: CGFloat { compact ? 3 : 4 }
+    private var trackHeight: CGFloat {
+        let n = CGFloat(max(bands.count, 1))
+        return n * laneHeight + (n - 1) * laneGap + 2 * trackPadding
+    }
+
     public var body: some View {
         VStack(alignment: .leading, spacing: compact ? 4 : 8) {
             GeometryReader { geo in
-                let w = geo.size.width, h = geo.size.height
-                ZStack(alignment: .leading) {
-                    // Dusk → midnight → dawn: the night deepens toward 3:00 and lifts after.
-                    Capsule()
+                let w = geo.size.width
+                ZStack(alignment: .topLeading) {
+                    // Dusk → deepest night → dawn.
+                    RoundedRectangle(cornerRadius: trackHeight / 2)
                         .fill(LinearGradient(stops: [
                             .init(color: Theme.nightHigh, location: 0),
                             .init(color: Theme.night, location: 0.5),
                             .init(color: Theme.nightHigh, location: 0.8),
                             .init(color: Theme.nightRaised, location: 1),
                         ], startPoint: .leading, endPoint: .trailing))
-                        .overlay(Capsule().strokeBorder(Theme.hairline, lineWidth: 1))
-                    ForEach(bands) { band in
+                        .overlay(RoundedRectangle(cornerRadius: trackHeight / 2).strokeBorder(Theme.hairline, lineWidth: 1))
+                    // One lane per block: overlapping windows stay distinct; gold is only the outline.
+                    ForEach(Array(bands.enumerated()), id: \.element.id) { i, band in
                         if let r = Self.range(band.window) {
-                            RoundedRectangle(cornerRadius: h / 2)
-                                .fill(Theme.gold.opacity(band.isActive ? 0.28 : 0.12))
-                                .overlay(RoundedRectangle(cornerRadius: h / 2)
-                                    .strokeBorder(Theme.gold.opacity(band.isActive ? 0.9 : 0.4), lineWidth: 1))
-                                .frame(width: max(h, (r.upperBound - r.lowerBound) * w))
-                                .offset(x: r.lowerBound * w)
+                            Capsule()
+                                .fill(band.isActive ? Theme.nightHigh : Theme.nightRaised)
+                                .overlay(Capsule().strokeBorder(Theme.gold.opacity(band.isActive ? 1 : 0.45),
+                                                                lineWidth: band.isActive ? 1.5 : 1))
+                                .frame(width: max(laneHeight, (r.upperBound - r.lowerBound) * (w - 2 * trackPadding)),
+                                       height: laneHeight)
+                                .offset(x: trackPadding + r.lowerBound * (w - 2 * trackPadding),
+                                        y: trackPadding + CGFloat(i) * (laneHeight + laneGap))
                         }
                     }
                     if nowVisible {
-                        let x = Self.fraction(nowMinutes) * w
-                        Rectangle().fill(Theme.gold).frame(width: 2, height: h + 8).offset(x: x - 1)
+                        let x = trackPadding + Self.fraction(nowMinutes) * (w - 2 * trackPadding)
+                        Rectangle().fill(Theme.gold).frame(width: 2, height: trackHeight + 8).offset(x: x - 1, y: -4)
                     }
                 }
             }
-            .frame(height: compact ? 10 : 16)
+            .frame(height: trackHeight)
             if !compact {
                 HStack {
                     ForEach(["18:00", "21:00", "0:00", "3:00", "6:00", "9:00", "12:00"], id: \.self) { label in

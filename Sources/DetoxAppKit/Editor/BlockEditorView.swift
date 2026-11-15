@@ -163,12 +163,11 @@ public struct BlockEditorView: View {
                 ForEach(Formatting.weekdayOrder, id: \.self) { d in
                     let on = model.draft.weekdays.contains(d)
                     let locked = model.isRunning && model.existing!.weekdays.contains(d)
-                    Toggle(Formatting.letters[d]!, isOn: Binding(
-                        get: { on },
-                        set: { v in if v { model.draft.weekdays.insert(d) } else if !locked { model.draft.weekdays.remove(d) } }))
-                        .toggleStyle(.button)
-                        .disabled(locked)
-                        .accessibilityLabel(dayName(d))
+                    DayChip(letter: Formatting.letters[d]!, isOn: on, isLocked: locked) {
+                        if on { if !locked { model.draft.weekdays.remove(d) } } else { model.draft.weekdays.insert(d) }
+                    }
+                    .accessibilityLabel(dayName(d))
+                    .accessibilityValue(on ? (locked ? "incluido, fijo" : "incluido") : "no incluido")
                 }
             }
             Text(Formatting.scheduleLabel(window: model.draft.window, weekdays: model.draft.weekdays))
@@ -238,14 +237,23 @@ public struct BlockEditorView: View {
     // MARK: pieces
 
     private func lockOption(_ kind: LockKindChoice) -> some View {
-        Button { model.lockChoice = kind } label: {
+        let irreversible = kind == .noExit
+        return Button { model.lockChoice = kind } label: {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: model.lockChoice == kind ? "largecircle.fill.circle" : "circle")
                     .foregroundStyle(model.lockChoice == kind ? Theme.gold : Theme.ivoryTertiary)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(lockTitle(kind)).fontWeight(.semibold)
+                    HStack(spacing: 6) {
+                        if irreversible { Image(systemName: "lock.fill").foregroundStyle(Theme.gold) }
+                        Text(lockTitle(kind)).fontWeight(.semibold)
+                    }
                     Text(lockDescription(kind)).font(.callout).foregroundStyle(Theme.ivorySecondary)
                 }
+                Spacer(minLength: 0)
+            }
+            .padding(irreversible ? 12 : 0)
+            .background {
+                if irreversible { RoundedRectangle(cornerRadius: 8).strokeBorder(Theme.gold.opacity(0.7), lineWidth: 1) }
             }
             .contentShape(Rectangle())
         }
@@ -328,6 +336,31 @@ extension Formatting {
         let months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
                       "octubre", "noviembre", "diciembre"]
         return "\(d.day) de \(months[d.month - 1])"
+    }
+}
+
+/// A weekday: gold when included; a committed day shows a lock instead of looking disabled.
+struct DayChip: View {
+    let letter: String
+    let isOn: Bool
+    let isLocked: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 3) {
+                Text(letter).fontWeight(.semibold)
+                if isLocked { Image(systemName: "lock.fill").font(.system(size: 8)) }
+            }
+            .frame(minWidth: 34, minHeight: 28)
+            .padding(.horizontal, isLocked ? 4 : 0)
+            .foregroundStyle(isOn ? Theme.night : Theme.ivorySecondary)
+            .background(RoundedRectangle(cornerRadius: 7).fill(isOn ? Theme.gold : Color.clear))
+            .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(isOn ? Color.clear : Theme.ivory.opacity(0.25), lineWidth: 1))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .help(isLocked ? "Este día ya forma parte del compromiso" : "")
     }
 }
 

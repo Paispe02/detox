@@ -1,4 +1,5 @@
 import AVKit
+import DetoxCore
 import Combine
 import SwiftUI
 
@@ -28,8 +29,8 @@ struct InterceptView: View {
             switch content {
             case .video(let url, _):
                 VideoPlayerView(url: url) { videoEnded = true }.ignoresSafeArea()
-            case .fallback(let phrase, _, let opensAt, let progress):
-                CalmPause(phrase: phrase, opensAt: opensAt, progress: progress, now: now)
+            case .fallback(let phrase, _, let opensAt, let progress, let window):
+                CalmPause(phrase: phrase, opensAt: opensAt, progress: progress, window: window, now: now)
             }
             VStack {
                 HStack {
@@ -59,26 +60,36 @@ struct CalmPause: View {
     let phrase: String
     let opensAt: Date?
     let progress: (current: Int, total: Int)?
+    let window: DailyWindow?
     let now: Date
 
     var body: some View {
-        VStack(spacing: 36) {
+        VStack(spacing: 40) {
             BreathingRing()
             Text(phrase)
                 .font(Theme.title(34))
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: 760)
+                .lineSpacing(4)
+                .frame(maxWidth: 540)
                 .fixedSize(horizontal: false, vertical: true)
-            VStack(spacing: 10) {
+            VStack(spacing: 14) {
                 if let opensAt {
-                    Text("Se abre a las \(Formatting.clock(opensAt)) · faltan \(Formatting.remaining(from: now, to: opensAt))")
+                    Text(Formatting.remaining(from: now, to: opensAt))
+                        .font(Theme.title(56).monospacedDigit())
+                    Text("hasta las \(Formatting.clock(opensAt))")
                         .font(.title3)
                         .foregroundStyle(Theme.ivorySecondary)
+                }
+                if let window {
+                    NightArc(bands: [NightArc.Band(id: UUID(), window: window, isActive: true)], now: now)
+                        .frame(width: 620)
+                        .padding(.top, 6)
                 }
                 if let p = progress {
                     Text("Noche \(p.current) de \(p.total)")
                         .font(.title3.monospacedDigit())
                         .foregroundStyle(Theme.gold)
+                        .padding(.top, 4)
                 }
             }
         }
@@ -110,7 +121,7 @@ struct BreathingRing: View {
                     .frame(width: 220, height: 220)
                     .scaleEffect(p.scale)
                 Circle()
-                    .fill(Theme.gold.opacity(0.08))
+                    .fill(Theme.nightRaised)
                     .frame(width: 220, height: 220)
                     .scaleEffect(p.scale)
                 Text(reduceMotion ? "Inspira 4 · mantén 4 · suelta 6" : p.label)
@@ -157,9 +168,9 @@ struct VideoPlayerView: NSViewRepresentable {
 
 /// For design review renders only.
 public enum InterceptPreview {
-    public static func calm(blockName: String, opensAt: Date?, progress: (Int, Int)?, now: Date) -> some View {
+    public static func calm(blockName: String, opensAt: Date?, progress: (Int, Int)?, window: DailyWindow? = nil, now: Date) -> some View {
         InterceptView(content: .fallback(phrase: "El impulso dura unos segundos. Respira y deja que pase.", blockName: blockName,
-                                         opensAt: opensAt, progress: progress.map { ($0.0, $0.1) }),
+                                         opensAt: opensAt, progress: progress.map { ($0.0, $0.1) }, window: window),
                       shownAt: now, onClose: {}, now: now, ticks: false)
     }
 

@@ -3,7 +3,8 @@ import Foundation
 
 /// The one line that names the span you are inside (header of every surface).
 public enum StatusSummary {
-    public static func headline(_ s: StatusSnapshot?) -> String {
+    public static func headline(_ s: StatusSnapshot?, reachable: Bool) -> String {
+        if !reachable { return "Detox no está protegiendo tus noches" }
         guard let s else { return "Conectando…" }
         let active = s.blocks.filter { $0.phase == .active }
         if let end = active.compactMap(\.activeWindowEnd).max() {
@@ -20,8 +21,8 @@ public enum StatusSummary {
         return "Sin bloqueos programados"
     }
 
-    public static func detail(_ s: StatusSnapshot?) -> String? {
-        guard let s else { return nil }
+    public static func detail(_ s: StatusSnapshot?, reachable: Bool = true) -> String? {
+        guard reachable, let s else { return nil }
         if let end = s.blocks.filter({ $0.phase == .active }).compactMap(\.activeWindowEnd).max() {
             return "Faltan \(Formatting.remaining(from: s.now, to: end))"
         }

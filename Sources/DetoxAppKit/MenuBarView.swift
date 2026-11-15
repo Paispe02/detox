@@ -5,13 +5,16 @@ public struct MenuBarView: View {
     @ObservedObject var connection: DaemonConnection
     var automationMissing: Bool
     var onOpen: () -> Void
+    var onFixPermission: () -> Void
     var onUnlock: (BlockView) -> Void
 
     public init(connection: DaemonConnection, automationMissing: Bool,
-                onOpen: @escaping () -> Void, onUnlock: @escaping (BlockView) -> Void) {
+                onOpen: @escaping () -> Void, onFixPermission: @escaping () -> Void = {},
+                onUnlock: @escaping (BlockView) -> Void) {
         self.connection = connection
         self.automationMissing = automationMissing
         self.onOpen = onOpen
+        self.onFixPermission = onFixPermission
         self.onUnlock = onUnlock
     }
 
@@ -22,8 +25,8 @@ public struct MenuBarView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(StatusSummary.headline(connection.snapshot)).font(Theme.title(19))
-                if let d = StatusSummary.detail(connection.snapshot) {
+                Text(StatusSummary.headline(connection.snapshot, reachable: connection.isDaemonReachable)).font(Theme.title(19))
+                if let d = StatusSummary.detail(connection.snapshot, reachable: connection.isDaemonReachable) {
                     Text(d).foregroundStyle(Theme.ivorySecondary)
                 }
             }
@@ -55,8 +58,11 @@ public struct MenuBarView: View {
                     .foregroundStyle(Theme.gold)
             }
             if automationMissing {
-                Label("Falta el permiso para cerrar pestañas.", systemImage: "hand.raised.fill")
-                    .font(.callout).foregroundStyle(Theme.ivorySecondary)
+                VStack(alignment: .leading, spacing: 6) {
+                    Label("Detox no puede cerrar pestañas bloqueadas: falta un permiso.", systemImage: "hand.raised.fill")
+                        .font(.callout).foregroundStyle(Theme.ivorySecondary)
+                    Button("Dar permiso…", action: onFixPermission).controlSize(.small)
+                }
             }
 
             Divider().overlay(Theme.hairline)

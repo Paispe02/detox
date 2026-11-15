@@ -80,7 +80,7 @@ public final class AppModel: ObservableObject {
         if let video = VideoLibrary.randomVideo(in: AppSettings.videoFolder) { return .video(video, blockName: name) }
         let block = connection.snapshot?.blocks.first { a.blockIDs.contains($0.id) }
         return .fallback(phrase: Phrases.random(), blockName: name, opensAt: block?.activeWindowEnd,
-                         progress: block.map { ($0.progressCurrent, $0.progressTotal) })
+                         progress: block.map { ($0.progressCurrent, $0.progressTotal) }, window: block?.window)
     }
 
     // MARK: actions

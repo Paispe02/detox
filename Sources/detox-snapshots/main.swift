@@ -48,6 +48,7 @@ final class Canned: DaemonClienting, @unchecked Sendable {
     window.contentView = host
     window.setContentSize(fit)
     window.orderFrontRegardless()
+    if titled { NSApp.activate(ignoringOtherApps: true); window.makeKeyAndOrderFront(nil) }
     RunLoop.main.run(until: Date().addingTimeInterval(1.0))
     let target: NSView = titled ? (window.contentView!.superview ?? host) : host
     guard let rep = target.bitmapImageRepForCachingDisplay(in: target.bounds) else { return }
@@ -78,6 +79,8 @@ MainActor.assumeIsolated {
         render("editor-new", CGSize(width: 560, height: 560), BlockEditorView(existing: nil, friends: [ana], now: now, onSubmit: { _ in nil }, onCancel: {}))
         render("editor-running", CGSize(width: 560, height: 560), BlockEditorView(existing: snapshot.blocks[2], friends: [ana], now: now, onSubmit: { _ in nil }, onCancel: {}))
         render("editor-new-schedule", CGSize(width: 560, height: 560), BlockEditorView(existing: nil, friends: [ana], now: now, startStep: 1, onSubmit: { _ in nil }, onCancel: {}))
+        render("editor-new-dates", CGSize(width: 560, height: 560), BlockEditorView(existing: nil, friends: [ana], now: now, startStep: 2, onSubmit: { _ in nil }, onCancel: {}))
+        render("blocks-daemon-down-menubar", nil, MenuBarView(connection: down, automationMissing: false, onOpen: {}, onUnlock: { _ in }))
         render("editor-new-lock", CGSize(width: 560, height: 560), BlockEditorView(existing: nil, friends: [ana], now: now, startStep: 3, onSubmit: { _ in nil }, onCancel: {}))
         render("editor-running-schedule", CGSize(width: 560, height: 560), BlockEditorView(existing: snapshot.blocks[2], friends: [ana], now: now, startStep: 1, onSubmit: { _ in nil }, onCancel: {}))
         render("editor-running-lock", CGSize(width: 560, height: 560), BlockEditorView(existing: snapshot.blocks[2], friends: [ana], now: now, startStep: 3, onSubmit: { _ in nil }, onCancel: {}))
@@ -85,7 +88,7 @@ MainActor.assumeIsolated {
         render("unlock-password", nil, UnlockView(block: snapshot.blocks[1], rateLimitedUntil: nil, onUnlock: { _, _ in nil }, onClose: {}))
         render("unlock-friend", nil, UnlockView(block: snapshot.blocks[2], rateLimitedUntil: nil, onUnlock: { _, _ in nil }, onClose: {}))
         render("onboarding", nil, OnboardingView(onDone: {}))
-        render("intercept", CGSize(width: 1440, height: 900), InterceptPreview.calm(blockName: "Noches limpias", opensAt: snapshot.blocks[0].activeWindowEnd, progress: (5, 31), now: now))
+        render("intercept", CGSize(width: 1440, height: 900), InterceptPreview.calm(blockName: "Noches limpias", opensAt: snapshot.blocks[0].activeWindowEnd, progress: (5, 31), window: night, now: now))
         if let v = VideoLibrary.randomVideo(in: AppSettings.videoFolder) {
             render("intercept-video", CGSize(width: 1440, height: 900), InterceptPreview.video(v, blockName: "Noches limpias", now: now))
         }
