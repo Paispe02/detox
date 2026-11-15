@@ -339,7 +339,7 @@ extension Formatting {
     }
 }
 
-/// A weekday: gold when included; a committed day shows a lock instead of looking disabled.
+/// A weekday: gold outline when included; a committed day shows a lock instead of looking disabled.
 struct DayChip: View {
     let letter: String
     let isOn: Bool
@@ -354,9 +354,9 @@ struct DayChip: View {
             }
             .frame(minWidth: 34, minHeight: 28)
             .padding(.horizontal, isLocked ? 4 : 0)
-            .foregroundStyle(isOn ? Theme.night : Theme.ivorySecondary)
-            .background(RoundedRectangle(cornerRadius: 7).fill(isOn ? Theme.gold : Color.clear))
-            .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(isOn ? Color.clear : Theme.ivory.opacity(0.25), lineWidth: 1))
+            .foregroundStyle(isOn ? Theme.ivory : Theme.ivoryTertiary)
+            .background(RoundedRectangle(cornerRadius: 7).fill(isOn ? Theme.nightHigh : Color.clear))
+            .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(isOn ? Theme.gold : Theme.ivory.opacity(0.25), lineWidth: isOn ? 1.5 : 1))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
