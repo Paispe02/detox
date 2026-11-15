@@ -8,6 +8,8 @@
 
 ## Siguiente: tarea 16, pruebas en el Mac
 
+**Resultados (15 nov, 16:45):** creado el bloqueo «Prueba» (Instagram, YouTube, WhatsApp; contraseña `detox-prueba`; activo hoy de una hora antes a una hora después de las 16:45). Paso 2 OK: 2 marcadores DETOX en /etc/hosts, `curl https://www.instagram.com` corta la conexión TLS, Gmail responde (301). Log del servicio sin errores.
+
 Usar **solo bloqueos con Contraseña**, fechas de hoy y franja que incluya ahora. Pasos del plan, ninguno hecho todavía:
 
 1. Onboarding: conceder Automatización a Safari y Chrome.
