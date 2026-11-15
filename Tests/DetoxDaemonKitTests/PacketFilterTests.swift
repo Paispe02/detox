@@ -72,3 +72,9 @@ import Testing
     try policy.apply(enabled: false)
     #expect(!FileManager.default.fileExists(atPath: path))
 }
+
+@Test func flushRemovesAnchorEvenWithoutLocalState() throws {
+    let r = RecordingCommandRunner()
+    try PacketFilter(runner: r).flush()
+    #expect(r.invocations.map { [$0.0] + $0.1 } == [["/sbin/pfctl", "-a", "com.apple/detox", "-F", "all"]])
+}

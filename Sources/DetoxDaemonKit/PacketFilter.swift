@@ -57,6 +57,12 @@ public final class PacketFilter {
         }
     }
 
+    /// Flushes the anchor regardless of what this instance remembers (used by --cleanup after the daemon stops).
+    public func flush() throws {
+        try runner.run(pfctl, ["-a", anchor, "-F", "all"])
+        loaded = false
+    }
+
     /// Reloads our rules if someone flushed the anchor.
     public func verify() throws {
         guard loaded else { return }

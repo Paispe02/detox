@@ -1,0 +1,3 @@
+Provenance: copied unmodified from the user's brand kit,
+iCloud Drive › Marca Personal › 02_Logos/Pais_Solutions/icono-circular.png (Pais Solutions seal for tools).
+scripts/build.sh turns it into AppIcon.icns with sips + iconutil (resize only).

@@ -52,6 +52,7 @@ public final class Enforcer {
     public func cleanup() {
         log { try hosts.apply(domains: []) }
         log { try packetFilter.apply(enabled: false) }
+        log { try packetFilter.flush() }
         log { try chromePolicy.apply(enabled: false) }
     }
 
