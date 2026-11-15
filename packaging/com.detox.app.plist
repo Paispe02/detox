@@ -7,6 +7,7 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/Applications/Detox.app/Contents/MacOS/Detox</string>
+		<string>--background</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
