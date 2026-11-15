@@ -12,6 +12,8 @@
 
 **15 nov, 18:00:** reinstalado con vídeo/foto/respiración al azar y apertura de ventana desde Aplicaciones (arranque de sesión con `--background`). Vídeos del usuario movidos a `~/Movies/Detox`. Bloqueo «Prueba 2» activo hasta las 20:00 (contraseña `detox-prueba`).
 
+**15 nov, 18:41:** reinstalado: pestañas bloqueadas se recargan una vez (no se cierran) y la misma pestaña/app muestra la pantalla como mucho cada 5 min (antes saltaba sola por las reconexiones de YouTube). Pendiente que el usuario confirme en Chrome.
+
 Usar **solo bloqueos con Contraseña**, fechas de hoy y franja que incluya ahora. Pasos del plan, ninguno hecho todavía:
 
 1. Onboarding: conceder Automatización a Safari y Chrome.
