@@ -95,6 +95,6 @@ private func startServer(_ handler: @escaping (Request) -> Response) throws -> (
         let line = try IPCCoding.encodeLine(r)
         #expect(line.last == UInt8(ascii: "\n"))
         let back: Request = try IPCCoding.decode(line.dropLast())
-        #expect(try IPCCoding.encodeLine(back) == line)
+        #expect(back == r)
     }
 }

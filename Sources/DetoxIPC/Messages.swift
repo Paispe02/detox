@@ -1,7 +1,7 @@
 import DetoxCore
 import Foundation
 
-public enum Request: Codable, Sendable {
+public enum Request: Codable, Sendable, Equatable {
     case ping
     case status
     case createBlock(BlockDraft)
