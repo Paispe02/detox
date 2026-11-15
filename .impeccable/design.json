@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-15T15:35:35.808540+00:00",
+  "title": "Design System: Detox",
+  "extensions": {
+    "colorMeta": {
+      "night": {
+        "role": "neutral",
+        "displayName": "Azul Noche",
+        "canonical": "#051526",
+        "tonalRamp": [
+          "#020A13",
+          "#051526",
+          "#0B2238",
+          "#12304D",
+          "#2A4B6B",
+          "#56738F",
+          "#9AAFC2",
+          "#DCE4EC"
+        ]
+      },
+      "night-raised": {
+        "role": "neutral",
+        "displayName": "Noche Alzada",
+        "canonical": "#0B2238",
+        "tonalRamp": [
+          "#020A13",
+          "#051526",
+          "#0B2238",
+          "#12304D",
+          "#2A4B6B",
+          "#56738F",
+          "#9AAFC2",
+          "#DCE4EC"
+        ]
+      },
+      "night-high": {
+        "role": "neutral",
+        "displayName": "Noche Alta",
+        "canonical": "#12304D",
+        "tonalRamp": [
+          "#020A13",
+          "#051526",
+          "#0B2238",
+          "#12304D",
+          "#2A4B6B",
+          "#56738F",
+          "#9AAFC2",
+          "#DCE4EC"
+        ]
+      },
+      "ivory": {
+        "role": "neutral",
+        "displayName": "Marfil",
+        "canonical": "#F7F4EC",
+        "tonalRamp": [
+          "#2B2925",
+          "#4D4A43",
+          "#77736A",
+          "#A19C91",
+          "#C7C2B6",
+          "#E2DED3",
+          "#F7F4EC",
+          "#FCFBF7"
+        ]
+      },
+      "ivory-secondary": {
+        "role": "neutral",
+        "displayName": "Marfil Secundario",
+        "canonical": "rgba(247, 244, 236, 0.72)"
+      },
+      "ivory-tertiary": {
+        "role": "neutral",
+        "displayName": "Marfil Terciario",
+        "canonical": "rgba(247, 244, 236, 0.5)"
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(247, 244, 236, 0.12)"
+      },
+      "gold": {
+        "role": "primary",
+        "displayName": "Oro",
+        "canonical": "#CFA046",
+        "tonalRamp": [
+          "#3A2A0C",
+          "#5E4516",
+          "#866424",
+          "#AD8335",
+          "#CFA046",
+          "#DDBA74",
+          "#EAD3A5",
+          "#F7EDD8"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Intercept countdown only."
+      },
+      "phrase": {
+        "displayName": "Phrase",
+        "purpose": "Motivational sentence on the intercept."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Main-window page headers naming the span you are inside."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet titles."
+      },
+      "title-row": {
+        "displayName": "Row Title",
+        "purpose": "Block and friend names."
+      },
+      "subhead": {
+        "displayName": "Subhead",
+        "purpose": "Header detail lines."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text and schedule labels."
+      },
+      "callout": {
+        "displayName": "Callout",
+        "purpose": "Metadata and hints."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Phase tags."
+      },
+      "tick": {
+        "displayName": "Tick",
+        "purpose": "NightArc hour labels."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "breath-inhale",
+        "value": "4s, cosine ease-in-out, scale 0.6 to 1.0",
+        "purpose": "Breathing ring expands."
+      },
+      {
+        "name": "breath-hold",
+        "value": "4s, scale 1.0",
+        "purpose": "Breathing ring holds."
+      },
+      {
+        "name": "breath-exhale",
+        "value": "6s, cosine ease-in-out, scale 1.0 to 0.6",
+        "purpose": "Breathing ring contracts."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "static ring, cue in words",
+        "purpose": "Accessibility Reduce Motion replaces the loop."
+      }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Native default action, gold-tinted; bound to Return.",
+      "html": "<button class=\"ds-btn-primary\">Crear bloqueo</button>",
+      "css": ".ds-btn-primary{background:#CFA046;color:#051526;font:500 13px -apple-system, system-ui, sans-serif;padding:4px 12px;border:none;border-radius:8px;cursor:pointer;transition:filter .15s} .ds-btn-primary:hover{filter:brightness(1.08)} .ds-btn-primary:active{filter:brightness(.92)} .ds-btn-primary:focus-visible{outline:3px solid rgba(207,160,70,.5);outline-offset:1px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Native push button on night; cancel and back actions.",
+      "html": "<button class=\"ds-btn\">Atrás</button>",
+      "css": ".ds-btn{background:rgba(247,244,236,.16);color:#F7F4EC;font:400 13px -apple-system, system-ui, sans-serif;padding:4px 12px;border:none;border-radius:8px;cursor:pointer} .ds-btn:hover{background:rgba(247,244,236,.22)} .ds-btn:focus-visible{outline:3px solid rgba(207,160,70,.5);outline-offset:1px}"
+    },
+    {
+      "name": "Phase Tag",
+      "kind": "chip",
+      "refersTo": "phase-tag-active",
+      "description": "Block phase beside its name; gold only when active.",
+      "html": "<span class=\"ds-tag ds-tag-on\">Activo</span> <span class=\"ds-tag\">En marcha</span>",
+      "css": ".ds-tag{display:inline-block;font:600 10px -apple-system, system-ui, sans-serif;padding:2px 7px;border-radius:9999px;background:#12304D;color:rgba(247,244,236,.72)} .ds-tag-on{background:#CFA046;color:#051526}"
+    },
+    {
+      "name": "Day Chip",
+      "kind": "chip",
+      "refersTo": "day-chip-on",
+      "description": "Weekday toggle; gold outline when included, lock glyph when committed.",
+      "html": "<button class=\"ds-day ds-day-on\">L</button><button class=\"ds-day\">M</button>",
+      "css": ".ds-day{min-width:34px;height:28px;margin-right:8px;font:600 13px -apple-system, system-ui, sans-serif;color:rgba(247,244,236,.5);background:transparent;border:1px solid rgba(247,244,236,.25);border-radius:7px;cursor:pointer} .ds-day-on{color:#F7F4EC;background:#12304D;border:1.5px solid #CFA046} .ds-day:hover{border-color:rgba(207,160,70,.6)} .ds-day:focus-visible{outline:2px solid #CFA046;outline-offset:2px}"
+    },
+    {
+      "name": "Removable Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Custom domain or app target in the editor.",
+      "html": "<span class=\"ds-chip\">twitch.tv <button aria-label=\"Quitar\">&#x2715;</button></span>",
+      "css": ".ds-chip{display:inline-flex;gap:4px;align-items:center;padding:4px 10px;border-radius:9999px;background:#12304D;color:#F7F4EC;font:400 13px -apple-system, system-ui, sans-serif} .ds-chip button{background:none;border:none;color:rgba(247,244,236,.72);cursor:pointer;font-size:10px} .ds-chip button:hover{color:#F7F4EC}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Native rounded-border field on night, gold focus ring.",
+      "html": "<input class=\"ds-input\" placeholder=\"Nombre\">",
+      "css": ".ds-input{background:rgba(247,244,236,.06);color:#F7F4EC;border:1px solid rgba(247,244,236,.18);border-radius:5px;padding:3px 6px;font:400 16px Georgia, serif} .ds-input::placeholder{color:rgba(247,244,236,.5)} .ds-input:focus-visible{outline:3px solid rgba(207,160,70,.5);outline-offset:0}"
+    },
+    {
+      "name": "Sidebar",
+      "kind": "nav",
+      "refersTo": "sidebar",
+      "description": "Native source list on night-raised.",
+      "html": "<nav class=\"ds-side\"><a class=\"on\">Bloqueos</a><a>Amigos</a><a>Ajustes</a></nav>",
+      "css": ".ds-side{background:#0B2238;width:190px;padding:8px;display:flex;flex-direction:column;gap:2px;font:400 13px -apple-system, system-ui, sans-serif} .ds-side a{color:#F7F4EC;padding:5px 10px;border-radius:6px;cursor:pointer} .ds-side a:hover{background:rgba(247,244,236,.06)} .ds-side a.on{background:rgba(207,160,70,.35)}"
+    },
+    {
+      "name": "Notice Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Service-down notice: night-raised, gold hairline, never red.",
+      "html": "<div class=\"ds-notice\"><strong>El servicio de Detox está desactivado.</strong><p>Tus bloqueos no se están aplicando.</p></div>",
+      "css": ".ds-notice{background:#0B2238;border:1px solid rgba(207,160,70,.5);border-radius:8px;padding:12px;color:#F7F4EC;font:400 13px -apple-system, system-ui, sans-serif} .ds-notice p{margin:2px 0 0;color:rgba(247,244,236,.72)}"
+    },
+    {
+      "name": "NightArc",
+      "kind": "custom",
+      "refersTo": "night-arc",
+      "description": "Signature band from 18:00 to 12:00 with block lanes and the gold now tick.",
+      "html": "<div class=\"ds-arc\"><div class=\"ds-band\" style=\"left:25%;width:40%\"></div><div class=\"ds-band ds-band-off\" style=\"left:28%;width:47%;top:15px\"></div><div class=\"ds-now\" style=\"left:30%\"></div></div>",
+      "css": ".ds-arc{position:relative;width:520px;height:30px;border-radius:15px;border:1px solid rgba(247,244,236,.12);background:linear-gradient(90deg,#12304D 0%,#051526 50%,#12304D 80%,#0B2238 100%)} .ds-band{position:absolute;top:4px;height:8px;border-radius:9999px;background:#12304D;box-sizing:border-box;border:1.5px solid #CFA046} .ds-band-off{background:#0B2238;border:1px solid rgba(207,160,70,.45)} .ds-now{position:absolute;top:-4px;width:2px;height:38px;background:#CFA046}"
+    },
+    {
+      "name": "Lock Option (irreversible)",
+      "kind": "custom",
+      "refersTo": "lock-option",
+      "description": "The no-exit choice, alone boxed in gold with the lock glyph.",
+      "html": "<button class=\"ds-lock\"><span class=\"r\"></span><span><b>Sin salida</b><br><small>Nada lo desbloquea hasta la fecha final.</small></span></button>",
+      "css": ".ds-lock{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;padding:12px;background:none;border:1px solid rgba(207,160,70,.7);border-radius:8px;color:#F7F4EC;font:400 13px -apple-system, system-ui, sans-serif;cursor:pointer} .ds-lock small{font-size:12px;color:rgba(247,244,236,.72)} .ds-lock .r{width:12px;height:12px;border-radius:50%;border:1px solid rgba(247,244,236,.5);margin-top:2px} .ds-lock:hover .r,.ds-lock:focus-visible .r{border-color:#CFA046}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Hora Azul",
+    "overview": "Detox is used at night, often with the lights off, at the exact moment the owner reaches for a distraction. The system is therefore a single dark world: an azul noche ground that never switches to light, ivory text in three quiet strengths, and one gold that draws lines, marks \"now\", and carries the active state. Nothing is loud. A blocked window is not a settings row; it is a stretch of night drawn between dusk (18:00) and late morning (12:00), and that band, the NightArc, recurs on every surface that talks about time.\n\nDensity is calm and native. The main window is a standard macOS split view with a sidebar; content sits left-aligned on generous page margins with Georgia headlines naming the span you are inside (\"Gran silencio hasta las 6:00\"). Controls are native AppKit/SwiftUI controls tinted gold, never re-skinned. The intercept screen is the one theatrical moment: chrome deleted, one thing owns the viewport, the breathing ring and a Georgia phrase centered on night.\n\nSeverity is spoken with gold hairlines and a lock glyph, never with red. Warnings, validation messages and the no-exit lock all use gold on night; the brand's binding palette has no alarm colour, and the product principle is friction with dignity.",
+    "keyCharacteristics": [
+      "Forced dark: every surface sits on azul noche; light mode is not offered.",
+      "Three ivory strengths (full, 72%, 50%) carry all text hierarchy; colour is not used for hierarchy.",
+      "Gold is the single accent: outlines, the \"now\" tick, the active tag, step progress, warnings.",
+      "Georgia for titles and big numbers; the system font for controls and running text.",
+      "The NightArc band (18:00 to 12:00) is the signature and appears in the menu bar, the main header, the schedule step and the intercept.",
+      "Depth by tonal layering of three blues; no shadows."
+    ],
+    "rules": [
+      {
+        "name": "The One Gold Rule",
+        "body": "Gold is the only chromatic accent. It marks lines, \"now\", the active state and anything that cannot be undone; it never fills a large area and never appears on an ivory ground.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Red Rule",
+        "body": "Errors, warnings and irreversible choices use gold text or a gold hairline plus the lock glyph. The palette has no red and no alarm hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Opacity Ladder Rule",
+        "body": "Text hierarchy is ivory at 100 / 72 / 50%. A finished block dims its whole row to 55% opacity rather than switching colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Serif Speaks Rule",
+        "body": "Georgia is for names, headlines, the intercept phrase and big numbers; every control, field label and line of metadata stays in the system font.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Time Rule",
+        "body": "Every number that counts or tells time (countdown, codes, \"Noche 5 de 31\", arc ticks) uses tabular figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal Layer Rule",
+        "body": "Raise a surface by stepping one blue lighter, never with a shadow or a glow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every surface on azul noche (#051526) and force the dark scheme.",
+      "Do show any time window on the NightArc rather than as a text-only setting.",
+      "Do mark irreversible or no-exit states with a gold hairline and the lock glyph.",
+      "Do set titles, names and big numbers in Georgia and keep controls native in the system font.",
+      "Do use tabular figures for every countdown, code and progress count.",
+      "Do step one blue lighter (night-raised, then night-high) to raise a surface.",
+      "Do honour Reduce Motion with a still state that keeps the cue in words."
+    ],
+    "donts": [
+      "Don't use red or any alarm hue for errors, warnings or destructive choices; gold carries severity.",
+      "Don't fill large areas with gold or place gold text on an ivory ground (brand guide).",
+      "Don't add shadows or glows; depth is tonal.",
+      "Don't custom-draw standard buttons, fields or pickers; tint the native ones gold. Custom controls are reserved for night-specific choices (day chips, lock options, the NightArc).",
+      "Don't recolour, stretch or add effects to the Pais Solutions seal if it is used (brand guide)."
+    ]
+  }
+}
