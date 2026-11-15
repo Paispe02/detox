@@ -183,3 +183,12 @@ private let content = InterceptContent.fallback(phrase: "x", blockName: "Noches"
     #expect(Phrases.all.count >= 20)
     #expect(Set(Phrases.all).count == Phrases.all.count)
 }
+
+@Test func closesWindowsFromLastToFirst() {
+    let scripts = FakeScripts()
+    scripts.tabs = [["https://www.instagram.com/"], ["https://mail.google.com/", "https://www.youtube.com/"], ["https://docs.example.com/"]]
+    let tabs = BrowserTabs(scripts: scripts, isRunning: { $0 == .safari }, frontmostBundleID: { nil })
+    #expect(tabs.closeTabs(matching: ["www.instagram.com", "www.youtube.com"]) == 2)
+    let closes = scripts.calls.filter { $0.contains("close tab") }
+    #expect(closes.count == 2 && closes[0].contains("close tab 2 of window 2") && closes[1].contains("close tab 1 of window 1"))
+}

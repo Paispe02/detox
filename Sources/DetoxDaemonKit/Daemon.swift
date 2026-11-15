@@ -75,6 +75,7 @@ public final class Daemon {
     public func start() throws {
         try queue.sync {
             state = try store.load()
+            if !dryRun { enforcer.resetFirewall() }
             requestNetworkTime()
             tickLocked()
         }
@@ -113,7 +114,15 @@ public final class Daemon {
 
     private func now() -> (date: Date, isTrusted: Bool) {
         let r = timeSource.readings()
-        return clock.now(monotonic: r.monotonic, wallClock: r.wall)
+        let t = clock.now(monotonic: r.monotonic, wallClock: r.wall)
+        return (state.effectiveNow(wall: t.date, isTrusted: t.isTrusted), t.isTrusted)
+    }
+
+    /// Persist the trusted-time high-water mark about once a minute.
+    private func recordTrustedTime(_ date: Date) {
+        if let last = state.lastTrustedTime, date.timeIntervalSince(last) < 60 { return }
+        state.lastTrustedTime = date
+        do { try store.save(state) } catch { log("no se pudo guardar el estado: \(error)") }
     }
 
     private func requestNetworkTime() {
@@ -142,6 +151,7 @@ public final class Daemon {
     private func tickLocked() {
         tickCount += 1
         let (date, trusted) = now()
+        if trusted { recordTrustedTime(date) }
         if clock.needsReanchor(monotonic: timeSource.readings().monotonic) { requestNetworkTime() }
         let newPlan = makeEnforcementPlan(blocks: state.blocks, now: date, isTrustedTime: trusted)
         var newPhases: [UUID: BlockPhase] = [:]

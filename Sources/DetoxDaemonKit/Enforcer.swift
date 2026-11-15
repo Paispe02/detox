@@ -48,6 +48,11 @@ public final class Enforcer {
         }
     }
 
+    /// On daemon start: drop rules a previous run may have left loaded; the first tick reloads them if needed.
+    public func resetFirewall() {
+        log { try packetFilter.flush() }
+    }
+
     /// Removes everything Detox put on the system.
     public func cleanup() {
         log { try hosts.apply(domains: []) }

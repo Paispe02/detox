@@ -57,7 +57,16 @@ public final class HostsFile {
     /// Writes the section if the file differs. Returns true when it changed.
     @discardableResult
     public func apply(domains: [String]) throws -> Bool {
-        let current = (try? String(contentsOfFile: path, encoding: .utf8)) ?? ""
+        let current: String
+        if FileManager.default.fileExists(atPath: path) {
+            // Unreadable or non-UTF-8: refuse rather than replace the user's file.
+            guard let s = String(data: try Data(contentsOf: URL(fileURLWithPath: path)), encoding: .utf8) else {
+                throw CocoaError(.fileReadInapplicableStringEncoding)
+            }
+            current = s
+        } else {
+            current = ""
+        }
         let rendered = HostsSection.render(original: current, domains: domains)
         guard rendered != current else { return false }
         let url = URL(fileURLWithPath: path).resolvingSymlinksInPath()

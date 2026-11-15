@@ -82,8 +82,8 @@ public final class BrowserTabs {
     public func closeTabs(matching domains: Set<String>) -> Int {
         guard !domains.isEmpty else { return 0 }
         let doomed = listTabs().filter { Self.host(of: $0.url).map { Self.matches(host: $0, domains: domains) } ?? false }
-        // Last tab first inside each window so indices stay valid.
-        for ref in doomed.sorted(by: { ($0.browser.rawValue, $0.window, -$0.tab) < ($1.browser.rawValue, $1.window, -$1.tab) }) {
+        // Last window and last tab first, so closing a window's only tab can't shift the indices still to close.
+        for ref in doomed.sorted(by: { ($0.browser.rawValue, -$0.window, -$0.tab) < ($1.browser.rawValue, -$1.window, -$1.tab) }) {
             _ = try? scripts.run(tell(ref.browser, "close tab \(ref.tab) of window \(ref.window)"))
         }
         return doomed.count

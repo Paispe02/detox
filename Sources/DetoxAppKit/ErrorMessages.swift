@@ -14,7 +14,9 @@ extension CommandError {
             case "pausa": return "La pausa debe durar entre 5 y 60 minutos."
             case "contraseña": return "La contraseña necesita al menos 4 caracteres."
             case "terminado": return "Este bloqueo ya terminó."
+            case "amigo reciente": return "Solo puede tener la llave un amigo registrado antes de que empezara este bloqueo."
             default:
+                if field.hasPrefix("app: ") { return "«\(field.dropFirst(5))» no se puede bloquear: elige una app normal de la carpeta Aplicaciones." }
                 if field.hasPrefix("dominio: ") { return "«\(field.dropFirst(9))» no es un dominio válido. Escribe algo como instagram.com." }
                 return "Algo no cuadra (\(field))."
             }

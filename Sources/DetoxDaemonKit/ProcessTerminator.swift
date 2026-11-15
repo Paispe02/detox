@@ -26,6 +26,10 @@ public final class LibprocProcessListing: ProcessListing {
         var out: [RunningProcess] = []
         var buf = [CChar](repeating: 0, count: 4 * Int(MAXPATHLEN))
         for pid in pids.prefix(Int(max(n, 0))) where pid > 0 {
+            var info = proc_bsdinfo()
+            let size = Int32(MemoryLayout<proc_bsdinfo>.size)
+            // Never touch root-owned processes, whatever their path.
+            if proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &info, size) == size, info.pbi_uid == 0 { continue }
             if proc_pidpath(pid, &buf, UInt32(buf.count)) > 0 {
                 out.append(RunningProcess(pid: pid, executablePath: String(cString: buf)))
             }
@@ -89,8 +93,10 @@ public final class ProcessTerminator {
     }
 
     public static func matches(_ processes: [RunningProcess], bundlePaths: [String]) -> [(RunningProcess, String)] {
-        processes.compactMap { p in
-            bundlePaths.first { p.executablePath.hasPrefix($0 + "/") }.map { (p, $0) }
+        let me = getpid()
+        return processes.compactMap { p in
+            guard p.pid > 1, p.pid != me else { return nil }
+            return bundlePaths.first { p.executablePath.hasPrefix($0 + "/") }.map { (p, $0) }
         }
     }
 

@@ -63,8 +63,35 @@ public struct DetoxState: Codable, Equatable, Sendable {
     public var blocks: [Block] = []
     public var friends: [FriendKey] = []
     public var limiter = AttemptLimiter()
+    /// High-water mark of network-verified time. While the clock is untrusted (offline after a reboot),
+    /// time never goes behind it, so setting the clock back can't make a running block deletable.
+    public var lastTrustedTime: Date?
 
     public init() {}
+
+    public func effectiveNow(wall: Date, isTrusted: Bool) -> Date {
+        guard !isTrusted, let last = lastTrustedTime else { return wall }
+        return max(wall, last)
+    }
+}
+
+/// Apps that must never be terminated: killing them breaks the Mac or Detox itself.
+let protectedBundleIDs: Set<String> = [
+    "com.apple.loginwindow", "com.apple.finder", "com.apple.dock", "com.apple.systemuiserver",
+    "com.apple.WindowServer", "com.apple.controlcenter", "com.apple.Terminal", "com.apple.ActivityMonitor",
+    "com.apple.systempreferences", "com.detox.app",
+]
+let protectedPathPrefixes = ["/System/", "/usr/", "/bin/", "/sbin/", "/Library/PrivilegedHelperTools/", "/private/", "/dev/"]
+
+/// The daemon kills processes as root by bundle path, so an AppTarget must be a real, ordinary .app.
+func isAcceptableApp(_ a: AppTarget) -> Bool {
+    let path = (a.path as NSString).standardizingPath
+    guard path.hasPrefix("/"), path.hasSuffix(".app"), path == a.path,
+          !protectedPathPrefixes.contains(where: { (path + "/").hasPrefix($0) }),
+          !protectedBundleIDs.contains(a.bundleID) else { return false }
+    guard let info = NSDictionary(contentsOfFile: path + "/Contents/Info.plist"),
+          let id = info["CFBundleIdentifier"] as? String else { return false }
+    return id == a.bundleID && !protectedBundleIDs.contains(id)
 }
 
 public let pauseRange = 5...60
@@ -89,6 +116,9 @@ extension DetoxState {
         for raw in d.targets.domains {
             guard let n = DomainNormalizer.normalize(raw) else { throw CommandError.invalid("dominio: \(raw)") }
             domains.insert(n)
+        }
+        for app in d.targets.apps where !isAcceptableApp(app) {
+            throw CommandError.invalid("app: \(app.name)")
         }
         let lock: Lock
         switch d.lock {
@@ -130,6 +160,12 @@ extension DetoxState {
             blocks[i] = try build(d, id: id, currentLock: old.lock, now: now)
         case .running, .active, .paused:
             var new = try build(d, id: id, currentLock: old.lock, now: now)
+            // A friend registered after the commitment began can't take over its lock:
+            // otherwise a self-registered "friend" turns a pause-only password lock into a cancellable one.
+            if case .friend(let fid) = new.lock, new.lock != old.lock,
+               let f = friends.first(where: { $0.id == fid }), f.createdAt >= old.commitmentInterval.start {
+                throw CommandError.invalid("amigo reciente")
+            }
             new.pausedUntil = old.pausedUntil
             new.cancelledAt = old.cancelledAt
             let v = tighteningViolations(from: old, to: new)
