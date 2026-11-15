@@ -25,6 +25,17 @@ public struct BlockView: Codable, Hashable, Identifiable, Sendable {
     public var commitmentEnd: Date
     public var progressCurrent: Int
     public var progressTotal: Int
+
+    public init(id: UUID, name: String, targets: BlockTargets, window: DailyWindow, weekdays: Set<Weekday>,
+                startDate: LocalDate, endDate: LocalDate, timeZoneID: String, lock: LockSummary, pauseMinutes: Int,
+                phase: BlockPhase, pausedUntil: Date?, activeWindowEnd: Date?, nextWindowStart: Date?,
+                commitmentEnd: Date, progressCurrent: Int, progressTotal: Int) {
+        self.id = id; self.name = name; self.targets = targets; self.window = window; self.weekdays = weekdays
+        self.startDate = startDate; self.endDate = endDate; self.timeZoneID = timeZoneID; self.lock = lock
+        self.pauseMinutes = pauseMinutes; self.phase = phase; self.pausedUntil = pausedUntil
+        self.activeWindowEnd = activeWindowEnd; self.nextWindowStart = nextWindowStart
+        self.commitmentEnd = commitmentEnd; self.progressCurrent = progressCurrent; self.progressTotal = progressTotal
+    }
 }
 
 public struct FriendView: Codable, Hashable, Identifiable, Sendable {
@@ -32,6 +43,10 @@ public struct FriendView: Codable, Hashable, Identifiable, Sendable {
     public var name: String
     public var isConfirmed: Bool
     public var blockNames: [String]
+
+    public init(id: UUID, name: String, isConfirmed: Bool, blockNames: [String]) {
+        self.id = id; self.name = name; self.isConfirmed = isConfirmed; self.blockNames = blockNames
+    }
 }
 
 public struct StatusSnapshot: Codable, Equatable, Sendable {

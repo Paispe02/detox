@@ -4,3 +4,4 @@ build/
 *.xcuserstate
 .superpowers/
 .DS_Store
+.impeccable/review/

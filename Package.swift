@@ -15,6 +15,8 @@ let package = Package(
         .executableTarget(name: "detoxd", dependencies: ["DetoxDaemonKit"]),
         .target(name: "DetoxAppKit", dependencies: ["DetoxCore", "DetoxIPC"]),
         .executableTarget(name: "Detox", dependencies: ["DetoxAppKit"]),
+        // Development only: renders every screen offscreen to PNG for design review.
+        .executableTarget(name: "detox-snapshots", dependencies: ["DetoxAppKit"]),
         .testTarget(name: "DetoxCoreTests", dependencies: ["DetoxCore"]),
         .testTarget(name: "DetoxIPCTests", dependencies: ["DetoxIPC"]),
         .testTarget(name: "DetoxDaemonKitTests", dependencies: ["DetoxDaemonKit"], resources: [.copy("Fixtures")]),
