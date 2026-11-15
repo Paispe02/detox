@@ -26,9 +26,10 @@ public struct BlockEditorView: View {
     private let onSubmit: (BlockDraft) async -> String?
     private let onCancel: () -> Void
 
-    public init(existing: BlockView?, friends: [FriendView], now: Date,
+    public init(existing: BlockView?, friends: [FriendView], now: Date, startStep: Int = 0,
                 onSubmit: @escaping (BlockDraft) async -> String?, onCancel: @escaping () -> Void) {
         _model = StateObject(wrappedValue: EditorModel(existing: existing, friends: friends, now: now))
+        _step = State(initialValue: Step(rawValue: startStep) ?? .what)
         self.onSubmit = onSubmit
         self.onCancel = onCancel
     }

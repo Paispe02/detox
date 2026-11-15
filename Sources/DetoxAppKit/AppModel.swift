@@ -29,8 +29,12 @@ public final class AppModel: ObservableObject {
         var block: BlockView? { if case .edit(let b) = self { return b } else { return nil } }
     }
 
-    public init(socketPath: String) {
-        connection = DaemonConnection(client: DetoxClient(socketPath: socketPath))
+    public convenience init(socketPath: String) {
+        self.init(connection: DaemonConnection(client: DetoxClient(socketPath: socketPath)))
+    }
+
+    public init(connection: DaemonConnection) {
+        self.connection = connection
     }
 
     public func start() {

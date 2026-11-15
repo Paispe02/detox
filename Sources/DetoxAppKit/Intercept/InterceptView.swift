@@ -9,7 +9,7 @@ struct InterceptView: View {
     let onClose: () -> Void
 
     @State private var videoEnded = false
-    @State private var now = Date()
+    @State var now = Date()
     private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var canClose: Bool {
@@ -19,6 +19,8 @@ struct InterceptView: View {
     private var secondsLeft: Int {
         max(0, Int(ceil(InterceptTiming.minimumSeconds - now.timeIntervalSince(shownAt))))
     }
+
+    var ticks = true
 
     var body: some View {
         ZStack {
@@ -49,7 +51,7 @@ struct InterceptView: View {
         }
         .foregroundStyle(Theme.ivory)
         .preferredColorScheme(.dark)
-        .onReceive(ticker) { now = $0 }
+        .onReceive(ticker) { if ticks { now = $0 } }
     }
 }
 
@@ -155,9 +157,13 @@ struct VideoPlayerView: NSViewRepresentable {
 
 /// For design review renders only.
 public enum InterceptPreview {
-    public static func calm(blockName: String, opensAt: Date?, progress: (Int, Int)?) -> some View {
+    public static func calm(blockName: String, opensAt: Date?, progress: (Int, Int)?, now: Date) -> some View {
         InterceptView(content: .fallback(phrase: "El impulso dura unos segundos. Respira y deja que pase.", blockName: blockName,
                                          opensAt: opensAt, progress: progress.map { ($0.0, $0.1) }),
-                      shownAt: Date(), onClose: {})
+                      shownAt: now, onClose: {}, now: now, ticks: false)
+    }
+
+    public static func video(_ url: URL, blockName: String, now: Date) -> some View {
+        InterceptView(content: .video(url, blockName: blockName), shownAt: now, onClose: {}, now: now, ticks: false)
     }
 }

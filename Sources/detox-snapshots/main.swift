@@ -37,23 +37,30 @@ final class Canned: DaemonClienting, @unchecked Sendable {
     func events() -> AsyncThrowingStream<DaemonEvent, Error> { AsyncThrowingStream { _ in } }
 }
 
-@MainActor func render<V: View>(_ name: String, _ size: CGSize, _ view: V) {
-    let host = NSHostingView(rootView: view.frame(width: size.width, height: size.height))
-    host.frame = CGRect(origin: .zero, size: size)
-    let window = NSWindow(contentRect: host.frame, styleMask: [.borderless], backing: .buffered, defer: false)
-    window.contentView = host
+/// size nil = the view's own fitting size (sheets, popover). titled = a real window with title bar and toolbar.
+@MainActor func render<V: View>(_ name: String, _ size: CGSize?, titled: Bool = false, _ view: V) {
+    let host = NSHostingView(rootView: view.frame(width: size?.width, height: size?.height).environment(\.colorScheme, .dark))
+    let fit = size ?? host.fittingSize
+    let style: NSWindow.StyleMask = titled ? [.titled, .closable, .resizable, .miniaturizable] : [.borderless]
+    let window = NSWindow(contentRect: CGRect(origin: .zero, size: fit), styleMask: style, backing: .buffered, defer: false)
     window.appearance = NSAppearance(named: .darkAqua)
-    host.layoutSubtreeIfNeeded()
-    RunLoop.main.run(until: Date().addingTimeInterval(0.6))
-    host.layoutSubtreeIfNeeded()
-    guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return }
-    host.cacheDisplay(in: host.bounds, to: rep)
+    window.title = "Detox"
+    window.contentView = host
+    window.setContentSize(fit)
+    window.orderFrontRegardless()
+    RunLoop.main.run(until: Date().addingTimeInterval(1.0))
+    let target: NSView = titled ? (window.contentView!.superview ?? host) : host
+    guard let rep = target.bitmapImageRepForCachingDisplay(in: target.bounds) else { return }
+    target.cacheDisplay(in: target.bounds, to: rep)
     try? rep.representation(using: .png, properties: [:])?.write(to: out.appendingPathComponent("\(name).png"))
-    print("wrote \(name).png")
+    window.orderOut(nil)
+    print("wrote \(name).png  \(Int(target.bounds.width))x\(Int(target.bounds.height))")
 }
 
 MainActor.assumeIsolated {
     NSApplication.shared.setActivationPolicy(.accessory)
+    // Show the icon the shipped bundle carries (build/Detox.app, from scripts/build.sh).
+    if let icon = NSImage(contentsOfFile: "build/Detox.app/Contents/Resources/AppIcon.icns") { NSApp.applicationIconImage = icon }
     let live = DaemonConnection(client: Canned(snapshot))
     let empty = DaemonConnection(client: Canned(StatusSnapshot(now: now, isTrustedTime: true, blocks: [], friends: [], blockedDomainsNow: [], rateLimitedUntil: nil)))
     let down = DaemonConnection(client: Canned(nil))
@@ -62,18 +69,26 @@ MainActor.assumeIsolated {
     Task { @MainActor in
         await live.refresh(); await empty.refresh(); await down.refresh()
         AppSettings.hasOnboarded = true
-        render("main-blocks", CGSize(width: 1000, height: 640), RootView(model: { let m = AppModel(socketPath: "/nonexistent"); return m }()).environmentObject(live))
+        render("main-blocks", CGSize(width: 1000, height: 640), titled: true, RootView(model: AppModel(connection: live)))
         render("blocks-list", CGSize(width: 820, height: 640), BlocksListView(connection: live, onNew: {}, onEdit: { _ in }, onUnlock: { _ in }).nightSurface())
         render("blocks-empty", CGSize(width: 820, height: 480), BlocksListView(connection: empty, onNew: {}, onEdit: { _ in }, onUnlock: { _ in }).nightSurface())
         render("blocks-daemon-down", CGSize(width: 820, height: 480), BlocksListView(connection: down, onNew: {}, onEdit: { _ in }, onUnlock: { _ in }).nightSurface())
-        render("menubar", CGSize(width: 320, height: 330), MenuBarView(connection: live, automationMissing: true, onOpen: {}, onUnlock: { _ in }))
+        render("menubar", nil, MenuBarView(connection: live, automationMissing: true, onOpen: {}, onUnlock: { _ in }))
         render("friends", CGSize(width: 820, height: 560), FriendsView(connection: live).nightSurface())
         render("editor-new", CGSize(width: 560, height: 560), BlockEditorView(existing: nil, friends: [ana], now: now, onSubmit: { _ in nil }, onCancel: {}))
         render("editor-running", CGSize(width: 560, height: 560), BlockEditorView(existing: snapshot.blocks[2], friends: [ana], now: now, onSubmit: { _ in nil }, onCancel: {}))
-        render("unlock-password", CGSize(width: 420, height: 300), UnlockView(block: snapshot.blocks[1], rateLimitedUntil: nil, onUnlock: { _, _ in nil }, onClose: {}))
-        render("unlock-friend", CGSize(width: 420, height: 400), UnlockView(block: snapshot.blocks[2], rateLimitedUntil: nil, onUnlock: { _, _ in nil }, onClose: {}))
-        render("onboarding", CGSize(width: 520, height: 600), OnboardingView(onDone: {}))
-        render("intercept", CGSize(width: 1440, height: 900), InterceptPreview.calm(blockName: "Noches limpias", opensAt: snapshot.blocks[0].activeWindowEnd, progress: (5, 31)))
+        render("editor-new-schedule", CGSize(width: 560, height: 560), BlockEditorView(existing: nil, friends: [ana], now: now, startStep: 1, onSubmit: { _ in nil }, onCancel: {}))
+        render("editor-new-lock", CGSize(width: 560, height: 560), BlockEditorView(existing: nil, friends: [ana], now: now, startStep: 3, onSubmit: { _ in nil }, onCancel: {}))
+        render("editor-running-schedule", CGSize(width: 560, height: 560), BlockEditorView(existing: snapshot.blocks[2], friends: [ana], now: now, startStep: 1, onSubmit: { _ in nil }, onCancel: {}))
+        render("editor-running-lock", CGSize(width: 560, height: 560), BlockEditorView(existing: snapshot.blocks[2], friends: [ana], now: now, startStep: 3, onSubmit: { _ in nil }, onCancel: {}))
+        render("editor-confirm", CGSize(width: 560, height: 560), { () -> BlockEditorView in BlockEditorView(existing: snapshot.blocks[2], friends: [ana], now: now, startStep: 4, onSubmit: { _ in nil }, onCancel: {}) }())
+        render("unlock-password", nil, UnlockView(block: snapshot.blocks[1], rateLimitedUntil: nil, onUnlock: { _, _ in nil }, onClose: {}))
+        render("unlock-friend", nil, UnlockView(block: snapshot.blocks[2], rateLimitedUntil: nil, onUnlock: { _, _ in nil }, onClose: {}))
+        render("onboarding", nil, OnboardingView(onDone: {}))
+        render("intercept", CGSize(width: 1440, height: 900), InterceptPreview.calm(blockName: "Noches limpias", opensAt: snapshot.blocks[0].activeWindowEnd, progress: (5, 31), now: now))
+        if let v = VideoLibrary.randomVideo(in: AppSettings.videoFolder) {
+            render("intercept-video", CGSize(width: 1440, height: 900), InterceptPreview.video(v, blockName: "Noches limpias", now: now))
+        }
         render("settings", CGSize(width: 700, height: 420), SettingsView().nightSurface())
         group.leave()
     }
