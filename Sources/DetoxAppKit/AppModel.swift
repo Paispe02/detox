@@ -77,8 +77,15 @@ public final class AppModel: ObservableObject {
 
     private func content(for a: AttemptEvent) -> InterceptContent {
         let name = a.blockNames.first ?? "Detox"
-        if let video = VideoLibrary.randomVideo(in: AppSettings.videoFolder) { return .video(video, blockName: name) }
         let block = connection.snapshot?.blocks.first { a.blockIDs.contains($0.id) }
+        let folder = AppSettings.videoFolder
+        let videos = MediaLibrary.videos(in: folder), photos = MediaLibrary.photos(in: folder)
+        var rng = SystemRandomNumberGenerator()
+        switch InterceptPicker.pick(hasVideos: !videos.isEmpty, hasPhotos: !photos.isEmpty, using: &rng) {
+        case .video: return .video(videos.randomElement()!, blockName: name)
+        case .photo: return .photo(photos.randomElement()!, phrase: Phrases.random(), blockName: name, opensAt: block?.activeWindowEnd)
+        case .calm: break
+        }
         return .fallback(phrase: Phrases.random(), blockName: name, opensAt: block?.activeWindowEnd,
                          progress: block.map { ($0.progressCurrent, $0.progressTotal) }, window: block?.window)
     }

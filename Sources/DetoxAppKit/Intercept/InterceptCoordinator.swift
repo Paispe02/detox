@@ -3,11 +3,13 @@ import Foundation
 
 public enum InterceptContent: Equatable {
     case video(URL, blockName: String)
+    case photo(URL, phrase: String, blockName: String, opensAt: Date?)
     case fallback(phrase: String, blockName: String, opensAt: Date?, progress: (current: Int, total: Int)?, window: DailyWindow? = nil)
 
     public static func == (a: InterceptContent, b: InterceptContent) -> Bool {
         switch (a, b) {
         case let (.video(u1, n1), .video(u2, n2)): return u1 == u2 && n1 == n2
+        case let (.photo(u1, p1, n1, o1), .photo(u2, p2, n2, o2)): return u1 == u2 && p1 == p2 && n1 == n2 && o1 == o2
         case let (.fallback(p1, n1, o1, g1, w1), .fallback(p2, n2, o2, g2, w2)):
             return p1 == p2 && n1 == n2 && o1 == o2 && g1?.current == g2?.current && g1?.total == g2?.total && w1 == w2
         default: return false
@@ -17,6 +19,7 @@ public enum InterceptContent: Equatable {
     public var blockName: String {
         switch self {
         case .video(_, let n): return n
+        case .photo(_, _, let n, _): return n
         case .fallback(_, let n, _, _, _): return n
         }
     }

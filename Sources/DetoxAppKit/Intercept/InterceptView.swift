@@ -29,6 +29,8 @@ struct InterceptView: View {
             switch content {
             case .video(let url, _):
                 VideoPlayerView(url: url) { videoEnded = true }.ignoresSafeArea()
+            case .photo(let url, let phrase, _, let opensAt):
+                PhotoPause(url: url, phrase: phrase, opensAt: opensAt, now: now)
             case .fallback(let phrase, _, let opensAt, let progress, let window):
                 CalmPause(phrase: phrase, opensAt: opensAt, progress: progress, window: window, now: now)
             }
@@ -53,6 +55,34 @@ struct InterceptView: View {
         .foregroundStyle(Theme.ivory)
         .preferredColorScheme(.dark)
         .onReceive(ticker) { if ticks { now = $0 } }
+    }
+}
+
+/// One of the user's photos fills the screen; the phrase and the time left sit low on a night scrim.
+struct PhotoPause: View {
+    let url: URL
+    let phrase: String
+    let opensAt: Date?
+    let now: Date
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            if let img = NSImage(contentsOf: url) {
+                Image(nsImage: img).resizable().aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            LinearGradient(colors: [Theme.night.opacity(0), Theme.night.opacity(0.92)], startPoint: .top, endPoint: .bottom)
+                .frame(height: 300)
+            VStack(spacing: 12) {
+                Text(phrase).font(Theme.title(32)).multilineTextAlignment(.center).frame(maxWidth: 540)
+                if let opensAt {
+                    Text("Se abre a las \(Formatting.clock(opensAt)) · faltan \(Formatting.remaining(from: now, to: opensAt))")
+                        .font(.title3).foregroundStyle(Theme.ivorySecondary)
+                }
+            }
+            .padding(.bottom, 64)
+        }
+        .ignoresSafeArea()
     }
 }
 
