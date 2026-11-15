@@ -59,7 +59,7 @@ public struct MenuBarView: View {
             }
             if automationMissing {
                 VStack(alignment: .leading, spacing: 6) {
-                    Label("Detox no puede cerrar pestañas bloqueadas: falta un permiso.", systemImage: "hand.raised.fill")
+                    Label("Detox no puede detener las pestañas bloqueadas: falta un permiso.", systemImage: "hand.raised.fill")
                         .font(.callout).foregroundStyle(Theme.ivorySecondary)
                     Button("Dar permiso…", action: onFixPermission).controlSize(.small)
                 }

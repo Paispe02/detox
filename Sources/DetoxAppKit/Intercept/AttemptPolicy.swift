@@ -19,6 +19,40 @@ public enum AttemptPolicy {
     }
 }
 
+/// The same thing (a tab's URL, an app) shows the screen at most once every 5 minutes:
+/// an open page retries its connections on its own, and that is not the user reaching for it.
+public struct RepeatGuard {
+    public static let interval: TimeInterval = 300
+    private var lastShown: [String: Date] = [:]
+
+    public init() {}
+
+    public mutating func allow(_ key: String, at now: Date) -> Bool {
+        if let last = lastShown[key], now.timeIntervalSince(last) < Self.interval { return false }
+        lastShown[key] = now
+        return true
+    }
+}
+
+/// Remembers which blocked tabs were already reloaded, so each is silenced once per block period.
+public struct TabSilencer {
+    private var done: Set<String> = []
+    private var lastBlocked: Set<String> = []
+
+    public init() {}
+
+    public mutating func pending(_ tabs: [TabRef], blocked: Set<String>) -> [TabRef] {
+        if blocked != lastBlocked { done = []; lastBlocked = blocked }
+        guard !blocked.isEmpty else { return [] }
+        let fresh = tabs.filter { tab in
+            guard let host = BrowserTabs.host(of: tab.url), BrowserTabs.matches(host: host, domains: blocked) else { return false }
+            return !done.contains("\(tab.browser.rawValue)|\(tab.url)")
+        }
+        fresh.forEach { done.insert("\($0.browser.rawValue)|\($0.url)") }
+        return fresh
+    }
+}
+
 public enum InterceptTiming {
     public static let minimumSeconds: TimeInterval = 60
     public static let cooldownSeconds: TimeInterval = 20

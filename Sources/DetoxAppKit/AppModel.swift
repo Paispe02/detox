@@ -11,6 +11,8 @@ public final class AppModel: ObservableObject {
     public let presenter = InterceptWindowPresenter()
     private lazy var coordinator = InterceptCoordinator(presenter: presenter)
     private let tabs = BrowserTabs()
+    private var repeatGuard = RepeatGuard()
+    private var silencer = TabSilencer()
     private var tasks: [Task<Void, Never>] = []
 
     @Published public var editing: EditorTarget?
@@ -58,12 +60,18 @@ public final class AppModel: ObservableObject {
         case .attempt(let a):
             let front = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
             let automation = front.flatMap(Browser.init(rawValue:)).map(BrowserTabs.automationGranted(for:)) ?? false
+            let frontURL = automation ? tabs.frontTabURL() : nil
             let show = AttemptPolicy.shouldShowScreen(event: a, frontmostBundleID: front,
-                                                      frontTabHost: automation ? tabs.frontTabHost() : nil,
+                                                      frontTabHost: frontURL.flatMap(BrowserTabs.host(of:)),
                                                       automationAvailable: automation, blockedDomains: blockedDomains)
-            if show { coordinator.handle(content(for: a)) }
-        case .windowStarted(_, let domains), .pauseEnded(_, let domains):
-            tabs.closeTabs(matching: Set(domains))
+            let key: String
+            switch a.target {
+            case .app(let bundleID, _): key = "app:" + bundleID
+            case .domain(let d): key = frontURL ?? "domain:" + d
+            }
+            if show && repeatGuard.allow(key, at: Date()) { coordinator.handle(content(for: a)) }
+        case .windowStarted, .pauseEnded:
+            silenceTabs()
         case .stateChanged:
             break
         }
@@ -71,8 +79,14 @@ public final class AppModel: ObservableObject {
 
     private func sweep() {
         automationMissing = BrowserTabs.automationMissing
+        silenceTabs()
+    }
+
+    /// Blocked tabs are reloaded once (the page can't load, a playing video stops); never closed.
+    private func silenceTabs() {
         let domains = blockedDomains
-        if !domains.isEmpty { tabs.closeTabs(matching: domains) }
+        let pending = silencer.pending(domains.isEmpty ? [] : tabs.listTabs(), blocked: domains)
+        if !pending.isEmpty { tabs.reloadTabs(pending) }
     }
 
     private func content(for a: AttemptEvent) -> InterceptContent {

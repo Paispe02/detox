@@ -14,7 +14,7 @@ scripts/build.sh
 sudo scripts/install.sh
 ```
 
-El segundo paso pide tu contraseña de administrador: instala el servicio que hace cumplir los bloqueos y la app de la barra de menú. Al abrirse por primera vez, Detox te pedirá permiso para controlar Safari y Chrome (para cerrar pestañas bloqueadas y saber qué pestaña tienes delante).
+El segundo paso pide tu contraseña de administrador: instala el servicio que hace cumplir los bloqueos y la app de la barra de menú. Al abrirse por primera vez, Detox te pedirá permiso para controlar Safari y Chrome (para detener las pestañas bloqueadas sin cerrarlas y saber qué pestaña tienes delante).
 
 ## Cómo funciona
 

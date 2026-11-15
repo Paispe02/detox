@@ -57,10 +57,30 @@ public final class BrowserTabs {
         "tell application id \"\(b.rawValue)\" to \(body)"
     }
 
-    public func frontTabHost() -> String? {
+    public func frontTabURL() -> String? {
         guard let id = frontmostBundleID(), let b = Browser(rawValue: id), isRunning(b) else { return nil }
-        guard let url = try? scripts.run(tell(b, "get URL of \(b.activeTabTerm) of front window")).stringValue else { return nil }
-        return Self.host(of: url)
+        return try? scripts.run(tell(b, "get URL of \(b.activeTabTerm) of front window")).stringValue
+    }
+
+    public func frontTabHost() -> String? {
+        frontTabURL().flatMap(Self.host(of:))
+    }
+
+    public func blockedTabs(matching domains: Set<String>) -> [TabRef] {
+        guard !domains.isEmpty else { return [] }
+        return listTabs().filter { Self.host(of: $0.url).map { Self.matches(host: $0, domains: domains) } ?? false }
+    }
+
+    /// Reloads the tabs in place: the page can't load while blocked, so a playing video stops,
+    /// but the tab and its window stay, and the user can reload it once the block is over.
+    @discardableResult
+    public func reloadTabs(_ refs: [TabRef]) -> Int {
+        for ref in refs where isRunning(ref.browser) {
+            let target = "tab \(ref.tab) of window \(ref.window)"
+            let body = ref.browser == .chrome ? "reload \(target)" : "set URL of \(target) to URL of \(target)"
+            _ = try? scripts.run(tell(ref.browser, body))
+        }
+        return refs.count
     }
 
     public func listTabs() -> [TabRef] {

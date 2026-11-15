@@ -45,7 +45,7 @@ public struct UnlockView: View {
                 .pickerStyle(.radioGroup)
             } else {
                 SecureField("Contraseña", text: $secret).textFieldStyle(.roundedBorder)
-                Text("Tendrás \(block.pauseMinutes) minutos. Después vuelve a bloquear y se cierran las pestañas.")
+                Text("Tendrás \(block.pauseMinutes) minutos. Después vuelve a bloquear y las pestañas bloqueadas se detienen.")
                     .font(.callout).foregroundStyle(Theme.ivoryTertiary)
             }
             if let until = rateLimitedUntil, until > .now {

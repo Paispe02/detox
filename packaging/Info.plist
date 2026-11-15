@@ -25,7 +25,7 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Detox necesita ver la pestaña activa y cerrar las pestañas de webs bloqueadas durante tus horarios.</string>
+	<string>Detox necesita ver la pestaña activa y detener las pestañas de webs bloqueadas durante tus horarios.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Pais Solutions</string>
 </dict>

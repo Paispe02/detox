@@ -23,7 +23,7 @@ public struct OnboardingView: View {
                 .foregroundStyle(Theme.ivorySecondary)
                 .fixedSize(horizontal: false, vertical: true)
             Text("Un permiso más").font(.headline)
-            Text("Para saber si la web bloqueada es la pestaña que tienes delante, y para cerrar las pestañas bloqueadas cuando empieza tu horario, Detox necesita permiso para controlar tus navegadores. macOS te lo preguntará una vez por navegador; el navegador debe estar abierto.")
+            Text("Para saber si la web bloqueada es la pestaña que tienes delante, y para detener las pestañas bloqueadas cuando empieza tu horario (se recargan sin cerrarse: al acabar el bloqueo, vuelve a cargarlas), Detox necesita permiso para controlar tus navegadores. macOS te lo preguntará una vez por navegador; el navegador debe estar abierto.")
                 .foregroundStyle(Theme.ivorySecondary)
                 .fixedSize(horizontal: false, vertical: true)
             ForEach(installed, id: \.self) { b in
