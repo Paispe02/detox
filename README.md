@@ -2,9 +2,17 @@
 
 Una app de macOS para tu detox de dopamina. Eliges qué bloquear (Instagram, YouTube, WhatsApp, cualquier web o app), a qué horas y entre qué fechas. Mientras dura, el compromiso solo puede ir a más. Si intentas entrar, en vez de la web te sale uno de tus vídeos o una pausa para respirar.
 
-## Instalar
+## Descargar
 
-Necesitas Xcode (ya lo tienes). En una terminal, dentro de esta carpeta:
+Descarga `Detox-1.0.pkg` desde [la última versión](https://github.com/Paispe02/detox/releases/latest) y ábrelo. Requiere un Mac con Apple Silicon y macOS 14 o posterior, y pide tu contraseña de administrador.
+
+El instalador no está firmado por Apple. La primera vez macOS dirá que no puede comprobarlo: ve a **Ajustes del Sistema › Privacidad y seguridad**, pulsa **Abrir igualmente** y vuelve a abrir el `.pkg`.
+
+Para desinstalar: `sudo "/Library/Application Support/Detox/installer/scripts/uninstall.sh"`.
+
+## Compilar e instalar desde el código
+
+Necesitas Xcode. En una terminal, dentro de esta carpeta:
 
 ```bash
 scripts/build.sh
@@ -59,3 +67,8 @@ Se niega mientras haya algún bloqueo en marcha y te dice hasta cuándo. Al desi
 - `DETOX_SOCKET=/tmp/dx/detox.sock swift run Detox` abre la app contra ese servicio de pruebas.
 - `swift run detox-snapshots <carpeta>` guarda capturas de todas las pantallas con datos de ejemplo.
 - Diseño: `docs/superpowers/specs/2026-11-15-detox-mac-design.md`. Plan: `docs/superpowers/plans/2026-11-15-detox-mac.md`.
+- `scripts/package.sh` crea el instalador `build/Detox-<versión>.pkg`.
+
+## Licencia
+
+MIT. Ver `LICENSE`.
